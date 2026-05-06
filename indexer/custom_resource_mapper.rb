@@ -3,7 +3,8 @@ require_relative '../../as_arclight/indexer/lib/mappers/arclight_mapper'
 class CustomResourceMapper < Arclight::ResourceMapper
 
   def map
-    # optional
+    # Call super to include the default mapping from ResourceMapper
+    # Alternatively, remove the call to super and implement a complete mapping
     super
 
     # pump the numbers!
