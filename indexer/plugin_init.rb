@@ -1,3 +1,5 @@
 require_relative 'custom_resource_mapper'
+require_relative 'custom_archival_object_mapper'
 
 Arclight::Mapper.register_resource_mapper(CustomResourceMapper)
+Arclight::Mapper.register_archival_object_mapper(CustomArchivalObjectMapper)
