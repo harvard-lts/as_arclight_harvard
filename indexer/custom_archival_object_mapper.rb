@@ -7,12 +7,7 @@ class CustomArchivalObjectMapper < Arclight::ArchivalObjectMapper
     # Alternatively, remove the call to super and implement a complete mapping
     super
 
-    # if this AO has any IIIF manifests associated with it,
-    # the last one processed is available in #manifest
-    # be sure to test for its presence before using it
-    if manifest
-      map_field('alt_thumbnail_ssi', manifest.thumbnail)
-    end
+    map_field('unitid_ssm', (0..3).map {|i| @json["id_#{i}"]}.compact.join('.'))
   end
 
 end
