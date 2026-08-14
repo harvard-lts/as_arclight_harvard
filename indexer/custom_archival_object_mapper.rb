@@ -7,7 +7,6 @@ class CustomArchivalObjectMapper < Arclight::ArchivalObjectMapper
     # Alternatively, remove the call to super and implement a complete mapping
     super
 
-    map_field('unitid_ssm', (0..3).map {|i| @json["id_#{i}"]}.compact.join('.'))
   end
 
 end

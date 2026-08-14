@@ -72,6 +72,7 @@ class CustomResourceMapper < Arclight::ResourceMapper
 
     map_field('unitid_ssm', (0..3).map {|i| @json["id_#{i}"]}.compact.join('.'))
     map_field('title_html_tesm', sanitize_mixed_content(@json["title"]))
+    map_field('sponsor_tesm', sanitize_mixed_content(@json.fetch("finding_aid_sponsor", "")))
 
   end
 
