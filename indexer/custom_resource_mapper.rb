@@ -61,6 +61,7 @@ class CustomResourceMapper < Arclight::ResourceMapper
 
 
     content = add_xlink_prefix(content) if XLINK_ELES.any? { |word| content =~ /<#{word}\s/ }
+    return content
   end
 
   ## END of stuff cribbed from core
