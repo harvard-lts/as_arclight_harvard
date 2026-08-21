@@ -71,13 +71,10 @@ class CustomResourceMapper < Arclight::ResourceMapper
     # Alternatively, remove the call to super and implement a complete mapping
     super
     unitid = (0..3).map {|i| @json["id_#{i}"]}.compact.join('.')
-    if unitid
-      map_field('unitid_ssm', unitid)
-      map_field('unitid_tesm', unitid)
-    end
+    map_field('unitid_ssm', unitid )
+    map_field('unitid_tesm', unitid)
     map_field('title_html_tesm', sanitize_mixed_content(@json["title"]))
-    if @json.key? 'finding_aid_sponsor'
-      map_field('sponsor_tesm', sanitize_mixed_content(@json["finding_aid_sponsor"]))
+    map_field('sponsor_tesm', sanitize_mixed_content(@json.fetch("finding_aid_sponsor", '')))
     end
   end
 

@@ -7,7 +7,9 @@ class CustomArchivalObjectMapper < Arclight::ArchivalObjectMapper
     # Alternatively, remove the call to super and implement a complete mapping
     super
     if @json.key? 'component_id'
-      map_field('unitid_ssm', @json['component_id'])
+      map_field('unitid_ssm', @json.fetch('component_id', ''))
+    else
+
     end
   end
 
