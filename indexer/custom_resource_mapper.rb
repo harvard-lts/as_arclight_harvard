@@ -61,6 +61,7 @@ class CustomResourceMapper < Arclight::ResourceMapper
 
 
     content = add_xlink_prefix(content) if XLINK_ELES.any? { |word| content =~ /<#{word}\s/ }
+    return content
   end
 
   ## END of stuff cribbed from core
@@ -69,10 +70,12 @@ class CustomResourceMapper < Arclight::ResourceMapper
     # Call super to include the default mapping from ResourceMapper
     # Alternatively, remove the call to super and implement a complete mapping
     super
-
-    map_field('unitid_ssm', (0..3).map {|i| @json["id_#{i}"]}.compact.join('.'))
+    unitid = (0..3).map {|i| @json["id_#{i}"]}.compact.join('.')
+    map_field('unitid_ssm', unitid )
+    map_field('unitid_tesm', unitid)
     map_field('title_html_tesm', sanitize_mixed_content(@json["title"]))
-
+    map_field('sponsor_tesm', sanitize_mixed_content(@json.fetch("finding_aid_sponsor", '')))
+    end
   end
 
 end
