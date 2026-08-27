@@ -6,11 +6,8 @@ class CustomArchivalObjectMapper < Arclight::ArchivalObjectMapper
     # Call super to include the default mapping from ArchivalObjectMapper
     # Alternatively, remove the call to super and implement a complete mapping
     super
-    if @json.key? 'component_id'
-      map_field('unitid_ssm', @json.fetch('component_id', ''))
-    else
+    map_field('unitid_ssm', @json.fetch('component_id', ''))
 
-    end
   end
 
 end
