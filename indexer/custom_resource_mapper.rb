@@ -64,6 +64,10 @@ class CustomResourceMapper < Arclight::ResourceMapper
     return content
   end
 
+  def fetch_tree_root(resource_uri)
+    JSONModel::HTTP.get_json(resource_uri + '/tree/root', :published_only => true)
+  end
+
   ## END of stuff cribbed from core
 
   def map
@@ -75,6 +79,26 @@ class CustomResourceMapper < Arclight::ResourceMapper
     map_field('unitid_tesim', unitid)
     map_field('title_html_tesm', sanitize_mixed_content(@json["title"]))
     map_field('sponsor_tesm', sanitize_mixed_content(@json.fetch("finding_aid_sponsor", '')))
+    # Containers - AFAICT containers are mapped into the EAD serially with top container
+    #   first and subsequent containers following, and picked up by traject grabbing solely
+    #   type and indicator in sequence
+    containers = fetch_tree_root(@json['uri'])
+    map_field('containers_ssim', containers.flat_map {|c|
+                out = []
+                if @json['top_container_type']
+                  out << "#{@json['top_container_type']} #{@json['top_container_indicator']}"
+                end
+                if @json['type_2']
+                  out << "#{@json['type_2']} #{@json['indicator_2']}"
+                end
+                if @json['type_3']
+                  out << "#{@json['type_3']} #{@json['indicator_3']}"
+                end
+                out
+              })
+
+    hollis_number = @json['notes'].find {|n| n['label'] == 'Alma ID'}.dig('subnotes', 0, 'content')
+    map_field('hollis_number_ssi', hollis_number)
   end
 
 end
