@@ -6,13 +6,8 @@ class CustomArchivalObjectMapper < Arclight::ArchivalObjectMapper
     # Call super to include the default mapping from ArchivalObjectMapper
     # Alternatively, remove the call to super and implement a complete mapping
     super
+    map_field('unitid_ssm', @json.fetch('component_id', ''))
 
-    # if this AO has any IIIF manifests associated with it,
-    # the last one processed is available in #manifest
-    # be sure to test for its presence before using it
-    if manifest
-      map_field('alt_thumbnail_ssi', manifest.thumbnail)
-    end
   end
 
 end
