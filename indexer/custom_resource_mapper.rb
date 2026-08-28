@@ -97,7 +97,7 @@ class CustomResourceMapper < Arclight::ResourceMapper
                 out
               })
 
-    hollis_number = @json['notes'].find {|n| n['label'] == 'Alma ID'}.dig('subnotes', 0, 'content')
+    hollis_number = @json['notes'].find {|n| n['label'] == 'Alma ID'}&.dig('subnotes', 0, 'content')
     map_field('hollis_number_ssi', hollis_number)
   end
 
