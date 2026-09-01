@@ -1,7 +1,7 @@
 
-# as_arclight_custom_example
+# as_arclight Harvard Mappings
 
-An ArchivesSpace plugin that demonstrates how to customize as_arclight mappings.
+This is a fork of as_arclgiht_custom_example [https://github.com/hudmol/as_arclight_custom_example]. This is mapping Harvard's custom fields or field overrides into the as_arclight indexer.
 
 Explanation of the files in this plugin:
 
