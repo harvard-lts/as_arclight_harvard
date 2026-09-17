@@ -1,5 +1,6 @@
 require_relative '../../as_arclight/indexer/lib/mappers/arclight_mapper'
 require_relative './mapper_common'
+require 'set'
 class CustomResourceMapper < Arclight::ResourceMapper
   include MapperCommon
   def map
@@ -51,7 +52,7 @@ class CustomResourceMapper < Arclight::ResourceMapper
                 out
               })
 
-    hollis_number = @json['notes'].find {|n| n['label'] == 'Alma ID'}&.dig('subnotes', 0, 'content')
+    hollis_number = @json['notes'].find {|n| Set['Alma ID', 'Hollis ID'].include? n['label'] }&.dig('subnotes', 0, 'content')
     map_field('hollis_number_ssi', hollis_number)
   end
 
