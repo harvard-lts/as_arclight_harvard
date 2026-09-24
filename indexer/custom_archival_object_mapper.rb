@@ -51,6 +51,14 @@ class CustomArchivalObjectMapper < Arclight::ArchivalObjectMapper
                 end
                 out
               })
+
+
+    has_digital_instance = walk(resource_uri, @json['uri']) do |node|
+      if node['has_digital_instance']
+        break true
+      end
+    end
+    map_field('has_online_content_ssm', has_digital_instance)
   end
 
 end

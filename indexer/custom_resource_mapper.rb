@@ -54,6 +54,13 @@ class CustomResourceMapper < Arclight::ResourceMapper
 
     hollis_number = @json['notes'].find {|n| Set['Alma ID', 'Aleph ID'].include? n['label'] }&.dig('subnotes', 0, 'content')
     map_field('hollis_number_ssi', hollis_number)
+
+    has_digital_instance = walk(@json['uri']) do |node|
+      if node['has_digital_instance']
+        break true
+      end
+    end
+    map_field('has_online_content_ssm', has_digital_instance)
   end
 
 end

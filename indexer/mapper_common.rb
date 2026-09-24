@@ -63,9 +63,46 @@ module MapperCommon
   end
 
   def fetch_tree_root(resource_uri)
-    JSONModel::HTTP.get_json(resource_uri + '/tree/root', :published_only => true)
+    JSONModel::HTTP.get_json(resource_uri + '/tree/root', published_only: true)
   end
 
+  def fetch_node(resource_uri, node_uri)
+    JSONModel::HTTP.get_json(resource_uri + '/tree/node', node_uri: node_uri, published_only: true)
+  end
   ## END of stuff cribbed from core
+
+  def fetch_waypoint(resource_uri, node_uri, offset)
+    JSONModel::HTTP.get_json("#{resource_uri}/tree/waypoint", parent_node: node_uri, published_only: true)
+  end
+
+  def walk(resource_uri, starting_point: nil, &blk)
+    node = if starting_point
+             fetch_node(resource_uri, starting_point)
+           else
+             fetch_tree_root(resource_uri)
+           end
+    yield node
+    if node['waypoints'] == 1 && node['precomputed_waypoints']
+      node['precomputed_waypoints'].values.map(&:values).flatten.each do |wp|
+        yield wp
+        if wp['waypoints'] > 0
+          walk(resource_uri, starting_point: wp['uri'], &blk)
+        end
+      end
+    elsif node['waypoints'] >= 1
+      node['waypoints'].times do |i|
+        fetch_waypoint(resource_uri, node['uri'], i).each do |wp|
+          for n in wp
+            yield n
+            if n['waypoints'] >= 1
+              walk(resource_uri, n['uri'], &blk)
+            end
+          end
+        end
+      end
+    else
+      return false
+    end
+  end
 
 end
