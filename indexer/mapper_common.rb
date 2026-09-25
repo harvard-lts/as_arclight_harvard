@@ -95,7 +95,7 @@ module MapperCommon
           for n in wp
             yield n
             if n['waypoints'] >= 1
-              walk(resource_uri, n['uri'], &blk)
+              walk(resource_uri, starting_point: n['uri'], &blk)
             end
           end
         end

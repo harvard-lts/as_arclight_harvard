@@ -53,7 +53,7 @@ class CustomArchivalObjectMapper < Arclight::ArchivalObjectMapper
               })
 
 
-    has_digital_instance = walk(resource_uri, @json['uri']) do |node|
+    has_digital_instance = walk(resource_uri, starting_point=@json['uri']) do |node|
       if node['has_digital_instance']
         break true
       end
