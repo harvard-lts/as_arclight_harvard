@@ -71,7 +71,7 @@ module MapperCommon
   end
   ## END of stuff cribbed from core
 
-  def fetch_waypoint(resource_uri, node_uri, offset)
+  def fetch_waypoint(resource_uri, node_uri, offset=0)
     JSONModel::HTTP.get_json("#{resource_uri}/tree/waypoint", parent_node: node_uri, published_only: true)
   end
 
@@ -92,7 +92,7 @@ module MapperCommon
     elsif node['waypoints'] >= 1
       node['waypoints'].times do |i|
         fetch_waypoint(resource_uri, node['uri'], i).each do |wp|
-          for n in wp
+          wp.each do |n|
             yield n
             if n['waypoints'] >= 1
               walk(resource_uri, starting_point: n['uri'], &blk)
