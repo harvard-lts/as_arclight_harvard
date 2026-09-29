@@ -72,7 +72,7 @@ module MapperCommon
   ## END of stuff cribbed from core
 
   def fetch_waypoint(resource_uri, node_uri, offset=0)
-    JSONModel::HTTP.get_json("#{resource_uri}/tree/waypoint", parent_node: node_uri, published_only: true)
+    JSONModel::HTTP.get_json("#{resource_uri}/tree/waypoint", parent_node: node_uri, published_only: true, offset: offset)
   end
 
   def walk(resource_uri, starting_point: nil, &blk)
