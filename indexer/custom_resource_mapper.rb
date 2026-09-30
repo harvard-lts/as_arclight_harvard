@@ -60,7 +60,7 @@ class CustomResourceMapper < Arclight::ResourceMapper
         break true
       end
     end
-    map_field('has_online_content_ssim', has_digital_instance)
+    map_field('has_online_content_ssim', has_digital_instance ? "true" : "false")
   end
 
 end
