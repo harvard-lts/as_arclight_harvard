@@ -18,7 +18,7 @@ class CustomResourceMapper < Arclight::ResourceMapper
     end
     map_field('normalized_title_html_ssm', nths)
 
-    map_field('extent_ssm', @json.fetch('extents', []).map do |e|
+    extents = @json.fetch('extents', []).map do |e|
       out = ""
       if e['number'] && e['extent_type']
         out << sanitize_mixed_content("#{e['number']} #{I18n.t('enumerations.extent_extent_type.'+e['extent_type'], :default => e['extent_type'])}")
@@ -30,8 +30,10 @@ class CustomResourceMapper < Arclight::ResourceMapper
         end
         out << " " << container_summary
       end
-      out.strip end
-    )
+      out.strip
+    end
+    map_field('extent_ssm', extents)
+    map_field('extent_tesim', extents)
 
     map_field('sponsor_tesm', sanitize_mixed_content(@json.fetch("finding_aid_sponsor", '')))
     # Containers - AFAICT containers are mapped into the EAD serially with top container
