@@ -19,7 +19,7 @@ class CustomArchivalObjectMapper < Arclight::ArchivalObjectMapper
     end
     map_field('normalized_title_html_ssm', nths)
 
-    map_field('extent_ssim', @json.fetch('extents', []).map do |e|
+    map_field('extent_ssm', @json.fetch('extents', []).map do |e|
       out = ""
       if e['number'] && e['extent_type']
         out << sanitize_mixed_content("#{e['number']} #{I18n.t('enumerations.extent_extent_type.'+e['extent_type'], :default => e['extent_type'])}")
