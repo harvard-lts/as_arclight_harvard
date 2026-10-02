@@ -40,19 +40,20 @@ class CustomResourceMapper < Arclight::ResourceMapper
     #   first and subsequent containers following, and picked up by traject grabbing solely
     #   type and indicator in sequence
     containers = fetch_tree_root(@json['uri']).fetch('containers', [])
-    map_field('containers_ssim', containers.flat_map {|c|
-                out = []
-                if @json['top_container_type']
-                  out << "#{@json['top_container_type']} #{@json['top_container_indicator']}"
-                end
-                if @json['type_2']
-                  out << "#{@json['type_2']} #{@json['indicator_2']}"
-                end
-                if @json['type_3']
-                  out << "#{@json['type_3']} #{@json['indicator_3']}"
-                end
-                out
-              })
+    processed_containers = containers.flat_map do |c|
+      out = []
+      if c['top_container_type']
+        out << "#{c['top_container_type']} #{c['top_container_indicator']}"
+      end
+      if c['type_2']
+        out << "#{c['type_2']} #{c['indicator_2']}"
+      end
+      if c['type_3']
+        out << "#{c['type_3']} #{c['indicator_3']}"
+      end
+      out
+    end
+    map_field('containers_ssim', processed_containers)
 
     hollis_number = @json['notes'].find {|n| Set['Alma ID', 'Aleph ID'].include? n['label'] }&.dig('subnotes', 0, 'content')
     map_field('hollis_number_ssi', hollis_number)

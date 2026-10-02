@@ -42,14 +42,14 @@ class CustomArchivalObjectMapper < Arclight::ArchivalObjectMapper
     containers = node.fetch('containers', [])
     map_field('containers_ssim', containers.flat_map {|c|
                 out = []
-                if @json['top_container_type']
-                  out << "#{@json['top_container_type']} #{@json['top_container_indicator']}"
+                if c['top_container_type']
+                  out << "#{c['top_container_type']} #{c['top_container_indicator']}"
                 end
-                if @json['type_2']
-                  out << "#{@json['type_2']} #{@json['indicator_2']}"
+                if c['type_2']
+                  out << "#{c['type_2']} #{c['indicator_2']}"
                 end
-                if @json['type_3']
-                  out << "#{@json['type_3']} #{@json['indicator_3']}"
+                if c['type_3']
+                  out << "#{c['type_3']} #{c['indicator_3']}"
                 end
                 out
               })
