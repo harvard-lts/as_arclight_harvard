@@ -91,12 +91,10 @@ module MapperCommon
       end
     elsif node['waypoints'] >= 1
       node['waypoints'].times do |i|
-        fetch_waypoint(resource_uri, node['uri'], i).each do |wp|
-          wp.each do |n|
-            yield n
-            if n['waypoints'] >= 1
-              walk(resource_uri, starting_point: n['uri'], &blk)
-            end
+        fetch_waypoint(resource_uri, node['uri'], i).each do |n|
+          yield n
+          if n['waypoints'] >= 1
+            walk(resource_uri, starting_point: n['uri'], &blk)
           end
         end
       end
