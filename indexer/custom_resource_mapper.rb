@@ -64,6 +64,9 @@ class CustomResourceMapper < Arclight::ResourceMapper
       end
     end
     map_field('has_online_content_ssim', has_digital_instance ? "true" : "false")
+  rescue
+    ARCLog.error('Failure while processing record: #{@json["uri"]}')
+    raise
   end
 
 end
