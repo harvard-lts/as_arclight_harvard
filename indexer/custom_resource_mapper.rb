@@ -3,6 +3,11 @@ require_relative './mapper_common'
 require 'set'
 class CustomResourceMapper < Arclight::ResourceMapper
   include MapperCommon
+  # add top_container to resolves
+  def self.resolves
+    ['repository', 'linked_agents', 'subjects', 'top_container']
+  end
+
   def map
     # Call super to include the default mapping from ResourceMapper
     # Alternatively, remove the call to super and implement a complete mapping
@@ -13,7 +18,7 @@ class CustomResourceMapper < Arclight::ResourceMapper
     map_field('title_html_tesm', sanitize_mixed_content(@json["title"]))
 
     nths = @json["title"].gsub(/\s*,\s*$/, '').strip
-    unless @json["dates"].empty?
+    unless @json["dates"].blank?
       nths << ", " << @json["dates"].first['expression'].strip
     end
     map_field('normalized_title_html_ssm', nths)
@@ -23,7 +28,7 @@ class CustomResourceMapper < Arclight::ResourceMapper
       if e['number'] && e['extent_type']
         out << sanitize_mixed_content("#{e['number']} #{I18n.t('enumerations.extent_extent_type.'+e['extent_type'], :default => e['extent_type'])}")
       end
-      if e['container_summary'] && !e['container_summary'].strip.empty?
+      if e['container_summary'] && !e['container_summary'].strip.blank?
         container_summary = e['container_summary']
         unless container_summary.match(/\A\(.*\)\z/)
           container_summary = "(#{container_summary})"
@@ -36,24 +41,28 @@ class CustomResourceMapper < Arclight::ResourceMapper
     map_field('extent_tesim', extents)
 
     map_field('sponsor_tesm', sanitize_mixed_content(@json.fetch("finding_aid_sponsor", '')))
+
     # Containers - AFAICT containers are mapped into the EAD serially with top container
     #   first and subsequent containers following, and picked up by traject grabbing solely
     #   type and indicator in sequence
-    containers = fetch_tree_root(@json['uri']).fetch('containers', [])
-    processed_containers = containers.flat_map do |c|
-      out = []
-      if c['top_container_type']
-        out << "#{c['top_container_type']} #{c['top_container_indicator']}"
+    containers = @json.fetch('instances', []).select do |i|
+      if i.has_key? "sub_container"
+
+        sc = i['sub_container']
+        tc = sc['top_container']['_resolved']
+        out = [tc['display_string']]
+        unless sc['type_2'].blank?
+          out << "#{I18n.t('enumerations.container_type.' + sc['type_2'], default: sc['type_2'])} #{sc['indicator_2']}"
+        end
+        unless sc['type_3'].blank?
+          out << "#{I18n.t('enumerations.container_type.' + sc['type_3'], default: sc['type_3'])} #{sc['indicator_3']}"
+
+        end
+        out
       end
-      if c['type_2']
-        out << "#{c['type_2']} #{c['indicator_2']}"
-      end
-      if c['type_3']
-        out << "#{c['type_3']} #{c['indicator_3']}"
-      end
-      out
     end
-    map_field('containers_ssim', processed_containers)
+
+    map_field('containers_ssim', containers.flatten)
 
     hollis_number = @json['notes'].find {|n| Set['Alma ID', 'Aleph ID'].include? n['label'] }&.dig('subnotes', 0, 'content')
     map_field('hollis_number_ssi', hollis_number)

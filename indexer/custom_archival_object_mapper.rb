@@ -2,10 +2,6 @@ require_relative '../../as_arclight/indexer/lib/mappers/arclight_mapper'
 require_relative './mapper_common'
 class CustomArchivalObjectMapper < Arclight::ArchivalObjectMapper
   include MapperCommon
-  def fetch_tree_node(resource_uri, node_uri)
-    JSONModel::HTTP.get_json(resource_uri + '/tree/node', node_uri: node_uri)
-  end
-
   def map
     # Call super to include the default mapping from ArchivalObjectMapper
     # Alternatively, remove the call to super and implement a complete mapping
@@ -14,7 +10,7 @@ class CustomArchivalObjectMapper < Arclight::ArchivalObjectMapper
     map_field('title_html_tesm', sanitize_mixed_content(@json["title"]))
 
     nths = @json["title"].gsub(/\s*,\s*$/, '').strip
-    unless @json["dates"].empty?
+    unless @json["dates"].blank?
       nths << ", " << @json["dates"].first['expression'].strip
     end
     map_field('normalized_title_html_ssm', nths)
@@ -24,7 +20,7 @@ class CustomArchivalObjectMapper < Arclight::ArchivalObjectMapper
       if e['number'] && e['extent_type']
         out << sanitize_mixed_content("#{e['number']} #{I18n.t('enumerations.extent_extent_type.'+e['extent_type'], :default => e['extent_type'])}")
       end
-      if e['container_summary'] && !e['container_summary'].strip.empty?
+      if e['container_summary'] && !e['container_summary'].strip.blank?
         container_summary = e['container_summary']
         unless container_summary.match(/\A\(.*\)\z/)
           container_summary = "(#{container_summary})"
@@ -37,23 +33,25 @@ class CustomArchivalObjectMapper < Arclight::ArchivalObjectMapper
     map_field('extent_tesim', extents)
 
     resource_uri = resource['uri']
-    node_uri = @json['uri']
-    node = fetch_tree_node(resource_uri, node_uri)
-    containers = node.fetch('containers', [])
-    map_field('containers_ssim', containers.flat_map {|c|
-                out = []
-                if c['top_container_type']
-                  out << "#{c['top_container_type']} #{c['top_container_indicator']}"
-                end
-                if c['type_2']
-                  out << "#{c['type_2']} #{c['indicator_2']}"
-                end
-                if c['type_3']
-                  out << "#{c['type_3']} #{c['indicator_3']}"
-                end
-                out
-              })
 
+    containers = @json.fetch('instances', []).select do |i|
+      if i.has_key? "sub_container"
+
+        sc = i['sub_container']
+        tc = sc['top_container']['_resolved']
+        out = [tc['display_string']]
+        unless sc['type_2'].blank?
+          out << "#{I18n.t('enumerations.container_type.' + sc['type_2'], default: sc['type_2'])} #{sc['indicator_2']}"
+        end
+        unless sc['type_3'].blank?
+          out << "#{I18n.t('enumerations.container_type.' + sc['type_3'], default: sc['type_3'])} #{sc['indicator_3']}"
+
+        end
+        out
+      end
+    end
+
+    map_field('containers_ssim', containers.flatten)
 
     has_digital_instance = walk(resource_uri, starting_point: @json['uri']) do |node|
       if node['has_digital_instance']
