@@ -34,7 +34,7 @@ class CustomArchivalObjectMapper < Arclight::ArchivalObjectMapper
 
     resource_uri = resource['uri']
 
-    containers = @json.fetch('instances', []).select do |i|
+    containers = @json.fetch('instances', []).filter_map do |i|
       if i.has_key? "sub_container"
 
         sc = i['sub_container']
