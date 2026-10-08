@@ -45,7 +45,7 @@ class CustomResourceMapper < Arclight::ResourceMapper
     # Containers - AFAICT containers are mapped into the EAD serially with top container
     #   first and subsequent containers following, and picked up by traject grabbing solely
     #   type and indicator in sequence
-    containers = @json.fetch('instances', []).filter_map {|i
+    containers = @json.fetch('instances', []).filter_map do |i
       if i.has_key? "sub_container"
 
         sc = i['sub_container']
