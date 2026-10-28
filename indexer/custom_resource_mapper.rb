@@ -1,6 +1,13 @@
 require_relative '../../as_arclight/indexer/lib/mappers/arclight_mapper'
+require_relative 'digital_objects_mapping'
 
 class CustomResourceMapper < Arclight::ResourceMapper
+  include DigitalObjectsMapping
+
+  def self.resolves
+    super + ['instances::digital_object']
+  end
+
   # BEGIN cribbing from core
 
   # Hate this but to guarantee consistent behavior with former EAD process,
@@ -75,6 +82,7 @@ class CustomResourceMapper < Arclight::ResourceMapper
     map_field('unitid_tesim', unitid)
     map_field('title_html_tesm', sanitize_mixed_content(@json["title"]))
     map_field('sponsor_tesm', sanitize_mixed_content(@json.fetch("finding_aid_sponsor", '')))
+    map_field('digital_objects_ssm', digital_objects(@json.fetch('instances', [])))
   end
 
 end
